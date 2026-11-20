@@ -1,0 +1,6 @@
+ "use client";
+import {useEffect,useState} from "react";import {supabase} from "@/lib/supabase";import type {Post} from "@/lib/types";import PostCard from "@/components/PostCard";
+export default function Search(){const [q,setQ]=useState("");const [posts,setPosts]=useState<Post[]>([]);const [loading,setLoading]=useState(false);
+ useEffect(()=>{let active=true;const run=async()=>{setLoading(true);let query=supabase.from("posts").select("*").eq("published",true).order("created_at",{ascending:false}).limit(30);if(q.trim())query=query.or(`title.ilike.%${q.trim()}%,excerpt.ilike.%${q.trim()}%`);const {data}=await query;if(active)setPosts((data||[]) as Post[]);setLoading(false)};run();return()=>{active=false}},[q]);
+ return <main><div className="pagehead"><div className="wrap"><div className="eyebrow">FIND YOUR NEXT READ</div><h1>Explore stories</h1><input className="search" style={{width:"min(100%,500px)",padding:14}} placeholder="Search articles..." value={q} onChange={e=>setQ(e.target.value)}/></div></div><div className="wrap section">{loading?<p>Loading...</p>:posts.length?<div className="grid">{posts.map(p=><PostCard key={p.id} post={p}/>)}</div>:<div className="empty">No matching articles found.</div>}</div></main>
+}

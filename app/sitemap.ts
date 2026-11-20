@@ -1,0 +1,2 @@
+import type {MetadataRoute} from "next";import {supabase} from "@/lib/supabase";
+export default async function sitemap():Promise<MetadataRoute.Sitemap>{const base=process.env.NEXT_PUBLIC_SITE_URL||"https://technova.vercel.app";const {data}=await supabase.from("posts").select("slug,created_at").eq("published",true);const fixed=["","about","contact","privacy-policy","terms","disclaimer"].map(p=>({url:`${base}/${p}`,lastModified:new Date()}));return [...fixed,...(data||[]).map(p=>({url:`${base}/blog/${p.slug}`,lastModified:new Date(p.created_at)}))]}
